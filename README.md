@@ -4,37 +4,17 @@
 把这个github里面的文件放在相对于的路径下面。
 https://github.com/bitpaydev/bitpayxForWHMCS
 
-下载解压即可。
+下载解压即可。确保你的modules/gateways里面多了bitpayx的几个文件。
 
 
-👇
-在linux下面可以如下操作
 
 ```
 
 # 找到你的whmcs的路径
 cd /data/wwwroot/whmcs.xxxxx.com/
 
-# 先确认你现在还没有bitpayx，下面命令返回为空。
-ls modules/gateways/bitpayx*php
-
-
-mkdir bitpayx-tmp
-cd bitpayx-tmp
-
-wget https://github.com/bitpaydev/bitpayxForWHMCS/archive/master.zip
-unzip master.zip
-
-# 把文件复制过去
-mv bitpayxForWHMCS-master/modules/gateways/bitpayx* ../modules/gateways/.
-
-# 删除没用的临时文件
-cd ..
-rm -rf bitpayx-tmp
-
 # 确认已经有了bitpayx
 ls modules/gateways/bitpayx*php
-
 
 ```
 
