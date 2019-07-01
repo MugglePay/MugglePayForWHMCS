@@ -4,6 +4,10 @@
 把这个github里面的文件放在相对于的路径下面。
 https://github.com/bitpaydev/bitpayxForWHMCS
 
+下载解压即可。
+
+
+👇
 在linux下面可以如下操作
 
 ```
