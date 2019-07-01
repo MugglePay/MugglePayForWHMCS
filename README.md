@@ -48,7 +48,7 @@ ls modules/gateways/bitpayx*php
 <img src="https://cdn.mugglepay.com/docs/whmcs/whmcs-select-payment.png" />
 
 ## 3. 设置bitpay_secret。
-在商户后台获取后台token，填入开通几个支付渠道。
+在商户后台获取后台token，填入支付渠道的设置中（如果同时开通多种bitpay的支付，用相同的token即可）。
 
 
 ## 4. 开始收款！
