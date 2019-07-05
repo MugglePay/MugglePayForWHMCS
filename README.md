@@ -40,7 +40,8 @@ ls modules/gateways/bitpayx*php
 
 ## 注意事项
 1）收款默认CNY，如果你有其他的货币，请跟管理员联系。<br />
-2）退款请联系管理员。<br />
+2) WHMCS暂时不支持更改价格。如果需要更改价格，请让用户重新生成一个订单支付
+3）退款请联系管理员。<br />
 Email: mugglepay[at]gmail.com
 https://t.me/joinchat/GLKSKhUnE4GvEAPgqtChAQ
 
