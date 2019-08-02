@@ -41,7 +41,7 @@ function bitpayxForAlipay_link($params) {
         'merchant_order_id' => 'WHMCS_' . $params['invoiceid'],
         'price_amount' => $params['amount'],
         'price_currency' => 'CNY',
-        'pay_currency' => 'ALIPAY',
+        'pay_currency' => 'ALIGLOBAL',
         'title' => '支付单号：' . $params['invoiceid'],
         'description' => '充值：' . $params['amount'] . ' 元',
         'callback_url' => $systemurl."modules/gateways/bitpayxForAlipay/notify.php",
