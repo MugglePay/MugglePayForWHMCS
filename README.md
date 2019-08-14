@@ -62,3 +62,15 @@ https://github.com/bitpaydev/bitpayxForWHMCS/compare/alipay-global?expand=1
 Email: mugglepay[at]gmail.com
 https://t.me/joinchat/GLKSKhUnE4GvEAPgqtChAQ
 
+
+## 6. 内嵌二维码
+支持：
+PC端打开：支付宝手机扫码之后，手机唤起支付宝。
+手机端打开：点击二维码，唤起支付宝。
+PC端打开：微信手机扫码
+手机端打开：微信 不支持。
+
+<img src="https://cdn.mugglepay.com/docs/whmcs/innercode.jpg" />
+
+
+
