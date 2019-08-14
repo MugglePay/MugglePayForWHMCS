@@ -55,6 +55,7 @@ function bitpayxForWechat_link($params) {
 
     $code_ajax = '';
     $webpaylink = '';
+
     if (($result['status'] === 200 || $result['status'] === 201) && $result['invoice']) {
         $base_url = 'https://www.zhihu.com/qrcode?url=';
         $click_url = '#';
@@ -66,17 +67,24 @@ function bitpayxForWechat_link($params) {
             . $qrcode_img .
         '</a>';
 
-    } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order'] && $result['invoice']) {
+    } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order']) {
         if ($result['order']['status'] === 'NEW') {
-            $base_url = 'https://www.zhihu.com/qrcode?url=';
-            $click_url = '#';
-            $qrcode_url = $base_url . $result['invoice']['qrcode'];
+            // 重新checkout，成为这种货币
+            $checkoutData = [
+                'pay_currency' => 'WECHAT'
+            ];
+            $result = $bitpayx->mpcheckout($result['order']['order_id'], $checkoutData);
+            if (($result['status'] === 200 || $result['status'] === 201) && $result['invoice']) {
+                $base_url = 'https://www.zhihu.com/qrcode?url=';
+                $click_url = '#';
+                $qrcode_url = $base_url . $result['invoice']['qrcode'];
 
-            $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
-            $qrcode_txt = '请用微信扫码（不可相册扫码）';
-            $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">'
-                . $qrcode_img .
-            '</a>';
+                $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
+                $qrcode_txt = '请用微信扫码（不可相册扫码）';
+                $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">'
+                    . $qrcode_img .
+                '</a>';
+            }
         } else if ($result['order']['status'] === 'PAID') {
             $webpaylink = 'https://invoice.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
             $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
