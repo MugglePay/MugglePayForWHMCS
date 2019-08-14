@@ -42,6 +42,7 @@ function bitpayxForAlipay_link($params) {
         'price_amount' => $params['amount'],
         'price_currency' => 'CNY',
         'pay_currency' => 'ALIPAY',
+        'mobile' => true, // QRcode method
         'title' => '支付单号：' . $params['invoiceid'],
         'description' => '充值：' . $params['amount'] . ' 元',
         'callback_url' => $systemurl."modules/gateways/bitpayxForAlipay/notify.php",
@@ -56,16 +57,26 @@ function bitpayxForAlipay_link($params) {
     $code_ajax = '';
     $webpaylink = '';
     if (($result['status'] === 200 || $result['status'] === 201) && $result['payment_url']) {
-        $webpaylink = $result['payment_url'] . '&lang=zh';
-        $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">前往支付宝进行支付</a>';
-        $code = $code . '<div class="alipay" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';
-        return $code.'<script>
-            window.location = "' . $webpaylink . '";
-        </script>';
+        $base_url = 'https://www.zhihu.com/qrcode?url=';
+        $click_url = 'https://qrcode.icedropper.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
+        $qrcode_url = $base_url . $click_url;
+
+        $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
+        $qrcode_txt = '请用支付宝扫码，或手机点击支付';
+        $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">'
+            . $qrcode_img .
+        '</a>';
     } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order']) {
         if ($result['order']['status'] === 'NEW') {
-            $webpaylink = 'https://invoice.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
-            $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">前往支付宝进行支付</a>';
+            $base_url = 'https://www.zhihu.com/qrcode?url=';
+            $click_url = 'https://qrcode.icedropper.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
+            $qrcode_url = $base_url . $click_url;
+
+            $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
+            $qrcode_txt = '请用支付宝扫码，或手机点击支付';
+            $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">'
+                . $qrcode_img .
+            '</a>';
         } else if ($result['order']['status'] === 'PAID') {
             $webpaylink = 'https://invoice.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
             $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
@@ -90,7 +101,7 @@ function bitpayxForAlipay_link($params) {
             xmlhttp.onreadystatechange=function(){
                 if (xmlhttp.readyState==4 && xmlhttp.status==200){
                     trade_state=xmlhttp.responseText;
-                    if(trade_state=="SUCCESS"){
+                    if (trade_state.indexOf("SUCCESS") >= 0) {
                         document.getElementById("alipayBitpayX").innerHTML="支付成功";
                         window.location.reload()
                     }

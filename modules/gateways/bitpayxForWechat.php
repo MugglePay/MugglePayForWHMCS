@@ -55,17 +55,28 @@ function bitpayxForWechat_link($params) {
 
     $code_ajax = '';
     $webpaylink = '';
-    if (($result['status'] === 200 || $result['status'] === 201) && $result['payment_url']) {
-        $webpaylink = $result['payment_url'] . '&lang=zh';
-        $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">前往微信进行支付</a>';
-        $code = $code . '<div class="wechat" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';
-        return $code.'<script>
-            window.location = "' . $webpaylink . '";
-        </script>';
-    } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order']) {
+    if (($result['status'] === 200 || $result['status'] === 201) && $result['invoice']) {
+        $base_url = 'https://www.zhihu.com/qrcode?url=';
+        $click_url = '#';
+        $qrcode_url = $base_url . $result['invoice']['qrcode'];
+
+        $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
+        $qrcode_txt = '请用微信扫码（不可相册扫码）';
+        $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">'
+            . $qrcode_img .
+        '</a>';
+
+    } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order'] && $result['invoice']) {
         if ($result['order']['status'] === 'NEW') {
-            $webpaylink = 'https://invoice.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
-            $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">前往微信进行支付</a>';
+            $base_url = 'https://www.zhihu.com/qrcode?url=';
+            $click_url = '#';
+            $qrcode_url = $base_url . $result['invoice']['qrcode'];
+
+            $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
+            $qrcode_txt = '请用微信扫码（不可相册扫码）';
+            $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">'
+                . $qrcode_img .
+            '</a>';
         } else if ($result['order']['status'] === 'PAID') {
             $webpaylink = 'https://invoice.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
             $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
@@ -90,7 +101,7 @@ function bitpayxForWechat_link($params) {
             xmlhttp.onreadystatechange=function(){
                 if (xmlhttp.readyState==4 && xmlhttp.status==200){
                     trade_state=xmlhttp.responseText;
-                    if(trade_state=="SUCCESS"){
+                    if (trade_state.indexOf("SUCCESS") >= 0) {
                         document.getElementById("wechatBitpayX").innerHTML="支付成功";
                         window.location.reload()
                     }
