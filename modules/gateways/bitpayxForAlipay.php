@@ -64,7 +64,7 @@ function bitpayxForAlipay_link($params) {
 
         $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
         $qrcode_txt = '请用支付宝扫码，或手机点击支付';
-        $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">'
+        $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-block">'
             . $qrcode_img .
         '</a>';
     } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order']) {
@@ -82,7 +82,7 @@ function bitpayxForAlipay_link($params) {
 
                 $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
                 $qrcode_txt = '请用支付宝扫码，或手机点击支付';
-                $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">'
+                $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-block">'
                     . $qrcode_img .
                 '</a>';
             }
