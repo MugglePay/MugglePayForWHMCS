@@ -73,6 +73,7 @@ function bitpayxForWechat_link($params) {
         </script>';
     }
 
+    $debug = json_encode($result);
     if (($result['status'] === 200 || $result['status'] === 201) && $result['invoice']) {
         $code_ajax = getCodeAjax($result['invoice']['qrcode']);
     } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order']) {
@@ -90,7 +91,11 @@ function bitpayxForWechat_link($params) {
             $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="wechatBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
         }
     } else {
-        $code_ajax = '<a href="#" id="wechatBitpayX" class="btn btn-info btn-block">支付确认中</a>';
+        if ($result['status'] === 400 && $result['error_code'] === 'PAY_PRICE_ERROR') {
+            $code_ajax = '<a href="#" id="wechatBitpayX" class="btn btn-info btn-block">支付金额范围请至少5元，至多1000元。</a>';
+        } else {
+            $code_ajax = '<a href="#" id="wechatBitpayX" class="btn btn-info btn-block">支付确认中</a>';
+        }
     }
 
     $code = $code . '<div class="wechat" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';

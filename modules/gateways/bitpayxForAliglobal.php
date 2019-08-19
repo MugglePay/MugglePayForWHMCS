@@ -55,6 +55,7 @@ function bitpayxForAliglobal_link($params) {
     $payData['token'] = $bitpayx->sign($str_to_sign);
     $result = $bitpayx->mprequest($payData);
 
+    $debug = json_encode($result);
     $code_ajax = '';
     $webpaylink = '';
     if ($result['status'] === 200 || $result['status'] === 201) {
@@ -91,7 +92,11 @@ function bitpayxForAliglobal_link($params) {
             $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="aliglobalBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
         }
     } else {
-        $code_ajax = '<a href="#" id="aliglobalBitpayX" class="btn btn-info btn-block">支付确认中</a>';
+        if ($result['status'] === 400 && $result['error_code'] === 'PAY_PRICE_ERROR') {
+            $code_ajax = '<a href="#" id="aliglobalBitpayX" class="btn btn-info btn-block">支付金额范围请至少5元，至多1000元。</a>';
+        } else {
+            $code_ajax = '<a href="#" id="aliglobalBitpayX" class="btn btn-info btn-block">支付确认中</a>';
+        }
     }
 
     $code = $code . '<div class="alipay" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';

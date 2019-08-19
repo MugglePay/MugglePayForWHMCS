@@ -57,6 +57,7 @@ function bitpayxForAlipay_link($params) {
 
     $code_ajax = '';
     $webpaylink = '';
+    $debug = json_encode($result);
     if ($result['status'] === 200 || $result['status'] === 201) {
         $base_url = 'https://www.zhihu.com/qrcode?url=';
         $click_url = 'https://qrcode.icedropper.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
@@ -91,7 +92,11 @@ function bitpayxForAlipay_link($params) {
             $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
         }
     } else {
-        $code_ajax = '<a href="#" id="alipayBitpayX" class="btn btn-info btn-block">支付确认中</a>';
+        if ($result['status'] === 400 && $result['error_code'] === 'PAY_PRICE_ERROR') {
+            $code_ajax = '<a href="#" id="alipayBitpayX" class="btn btn-info btn-block">支付金额范围请至少5元，至多1000元。</a>';
+        } else {
+            $code_ajax = '<a href="#" id="alipayBitpayX" class="btn btn-info btn-block">不支持当前支付方式，请切换选择其他支付方式。</a>';
+        }
     }
 
     $code = $code . '<div class="alipay" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';
