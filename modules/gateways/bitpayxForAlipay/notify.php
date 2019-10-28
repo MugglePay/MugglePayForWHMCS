@@ -63,6 +63,10 @@ if(!$verify_result) {
         $paymentAmount = $cbData['pay_amount'];
         $feeAmount = 0;
 
+        $return = [];
+        $return['status'] = 200;
+        echo json_encode($return);
+
         // TODO(duplicate)
         checkCbTransID($transid);
         $invoiceId = checkCbInvoiceID($invoiceId, $GATEWAY["name"]);
@@ -84,9 +88,6 @@ if(!$verify_result) {
         addInvoicePayment($invoiceId,$transid,$paymentAmount,$feeAmount,'bitpayxForAlipay');
         logTransaction($GATEWAY["name"], $_POST, "Successful-A");
         // echo 'SUCCESS';exit;
-        $return = [];
-        $return['status'] = 200;
-        echo json_encode($return);
         exit;
     } else {
         logTransaction($GATEWAY["name"],$_POST,"Unsuccessful");
