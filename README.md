@@ -1,4 +1,4 @@
-# bitpayxForWHMCS 配置步骤 （5分钟）
+# MugglePayForWHMCS 配置步骤 （5分钟）
 
 ## 0. 请确认所需要权限
 
