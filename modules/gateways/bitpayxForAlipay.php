@@ -60,7 +60,7 @@ function bitpayxForAlipay_link($params) {
     $debug = json_encode($result);
     if ($result['status'] === 200 || $result['status'] === 201) {
         $base_url = 'https://www.zhihu.com/qrcode?url=';
-        $click_url = 'https://qrcode.icedropper.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
+        $click_url = 'https://qrcode.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
         $qrcode_url = $base_url . $click_url;
 
         $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
@@ -78,7 +78,7 @@ function bitpayxForAlipay_link($params) {
             $result = $bitpayx->mpcheckout($result['order']['order_id'], $checkoutData);
             if ($result['status'] === 200 || $result['status'] === 201) {
                 $base_url = 'https://www.zhihu.com/qrcode?url=';
-                $click_url = 'https://qrcode.icedropper.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
+                $click_url = 'https://qrcode.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
                 $qrcode_url = $base_url . $click_url;
 
                 $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
