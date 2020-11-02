@@ -1,13 +1,13 @@
 <?php
-function bitpayxForAlipay_config() {
+function bitpayxForCard_config() {
     $configarray = [
-        "FriendlyName"         => ["Type" => "System", "Value"=>"支付宝（MugglePay）"],
+        "FriendlyName"         => ["Type" => "System", "Value"=>"国际信用卡（MugglePay）"],
         "appSecret"         => ["FriendlyName" => "AppSecret", "Type" => "text", "Size" => "32", ],
     ];
     return $configarray;
 }
 
-function bitpayxForAlipay_refund($params) {
+function bitpayxForCard_refund($params) {
     if(!class_exists('BitpayX')) {
         include("bitpayx/class.php");
     }
@@ -23,14 +23,14 @@ function bitpayxForAlipay_refund($params) {
     ];
 }
 
-function bitpayxForAlipay_link($params) {
+function bitpayxForCard_link($params) {
     $systemurl = $params['systemurl'];
     if(substr($systemurl, -1) !== '/'){
         $systemurl = $systemurl . '/';
     }
 
     if (!stristr($_SERVER['PHP_SELF'], 'viewinvoice')) {
-        return '<img style="width: 150px" src="'.$systemurl.'modules/gateways/bitpayx/alipay.png" alt="支付宝支付" />';
+        return '<img style="width: 150px" src="'.$systemurl.'modules/gateways/bitpayx/creditcard.jpg" alt="信用卡支付" />';
     }
     if(!class_exists('BitpayX')) {
         include("bitpayx/class.php");
@@ -41,12 +41,12 @@ function bitpayxForAlipay_link($params) {
         'merchant_order_id' => 'WHMCS_' . $params['invoiceid'],
         'price_amount' => $params['amount'],
         'price_currency' => 'CNY',
-        'pay_currency' => 'ALIPAY',
+        'pay_currency' => 'CARD',
         'mobile' => true, // QRcode method
         'fast' => true,
         'title' => '支付单号：' . $params['invoiceid'],
         'description' => '充值：' . $params['amount'] . ' 元',
-        'callback_url' => $systemurl."modules/gateways/bitpayxForAlipay/notify.php",
+        'callback_url' => $systemurl."modules/gateways/bitpayxForCard/notify.php",
         'success_url' => $systemurl."viewinvoice.php?id=".$params['invoiceid'],
         'cancel_url' => $systemurl."viewinvoice.php?id=".$params['invoiceid'],
     ];
@@ -57,49 +57,26 @@ function bitpayxForAlipay_link($params) {
 
     $code_ajax = '';
     $webpaylink = '';
-    $debug = json_encode($result);
-    if ($result['status'] === 200 || $result['status'] === 201) {
-        $base_url = 'https://www.zhihu.com/qrcode?url=';
-        $click_url = 'https://qrcode.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
-        $qrcode_url = $base_url . $click_url;
-
-        $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
-        $qrcode_txt = '请用支付宝扫码，或手机点击支付';
-        $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-block">'
-            . $qrcode_img .
-        '</a>';
+    if (($result['status'] === 200 || $result['status'] === 201) && $result['payment_url']) {
+        $webpaylink = $result['payment_url'] . '&lang=zh';
+        $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="cardBitpayX" class="btn btn-info btn-block">前往信用卡支付</a>';
+        $code = $code . '<div class="card" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';
+        return $code.'<script>
+            window.location = "' . $webpaylink . '";
+        </script>';
     } else if ($result['status'] === 400 && $result['error_code'] === 'ORDER_MERCHANTID_EXIST' && $result['order']) {
         if ($result['order']['status'] === 'NEW') {
-            // 重新checkout，成为这种货币
-            $checkoutData = [
-                'pay_currency' => 'ALIPAY',
-                'mobile' => true,
-            ];
-            $result = $bitpayx->mpcheckout($result['order']['order_id'], $checkoutData);
-            if ($result['status'] === 200 || $result['status'] === 201) {
-                $base_url = 'https://www.zhihu.com/qrcode?url=';
-                $click_url = 'https://qrcode.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
-                $qrcode_url = $base_url . $click_url;
-
-                $qrcode_img = '<img style="width: 200px" src="' . $qrcode_url . '" />';
-                $qrcode_txt = '请用支付宝扫码，或手机点击支付';
-                $code_ajax = $qrcode_txt . '<a href="'.$click_url.'" target="_blank" id="alipayBitpayX" class="btn btn-block">'
-                    . $qrcode_img .
-                '</a>';
-            }
+            $webpaylink = 'https://invoice.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
+            $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="cardBitpayX" class="btn btn-info btn-block">前往信用卡进行支付</a>';
         } else if ($result['order']['status'] === 'PAID') {
             $webpaylink = 'https://invoice.mugglepay.com/invoices/?id=' . $result['order']['order_id'] . '&lang=zh';
-            $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="alipayBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
+            $code_ajax = '<a href="'.$webpaylink.'" target="_blank" id="cardBitpayX" class="btn btn-info btn-block">支付成功，等待商家确认</a>';
         }
     } else {
-        if ($result['status'] === 400 && $result['error_code'] === 'PAY_PRICE_ERROR') {
-            $code_ajax = '<a href="#" id="alipayBitpayX" class="btn btn-info btn-block">支付金额范围请至少5元，至多1000元。</a>';
-        } else {
-            $code_ajax = '<a href="#" id="alipayBitpayX" class="btn btn-info btn-block">不支持当前支付方式，请切换选择其他支付方式。</a>';
-        }
+        $code_ajax = '<a href="#" id="cardBitpayX" class="btn btn-info btn-block">支付确认中</a>';
     }
 
-    $code = $code . '<div class="alipay" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';
+    $code = $code . '<div class="card" style="max-width: 230px;margin: 0 auto">' . $code_ajax . '</div>';
     return $code.'<script>
         //设置每隔 5000 毫秒执行一次 load() 方法
         setInterval(function(){loadBitpayX()}, 5000);
@@ -115,8 +92,8 @@ function bitpayxForAlipay_link($params) {
             xmlhttp.onreadystatechange=function(){
                 if (xmlhttp.readyState==4 && xmlhttp.status==200){
                     trade_state=xmlhttp.responseText;
-                    if (trade_state.indexOf("SUCCESS") >= 0) {
-                        document.getElementById("alipayBitpayX").innerHTML="支付成功";
+                    if(trade_state=="SUCCESS"){
+                        document.getElementById("cardBitpayX").innerHTML="支付成功";
                         window.location.reload()
                     }
                 }

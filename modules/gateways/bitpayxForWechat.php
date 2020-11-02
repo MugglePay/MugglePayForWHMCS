@@ -1,7 +1,7 @@
 <?php
 function bitpayxForWechat_config() {
     $configarray = [
-        "FriendlyName"         => ["Type" => "System", "Value"=>"微信（BitpayX）"],
+        "FriendlyName"         => ["Type" => "System", "Value"=>"微信（MugglePay）"],
         "appSecret"         => ["FriendlyName" => "AppSecret", "Type" => "text", "Size" => "32", ],
     ];
     return $configarray;
